@@ -10,6 +10,9 @@ void main() async{
   http.Response response = await http.get(requestURL);
   runApp(MaterialApp(
     home: Home(),
+    theme: ThemeData(
+      primaryColor: Colors.purple,
+    ),
   ));
 }
 
@@ -76,7 +79,8 @@ class _HomeState extends State<Home>{
                       inputFormatters: [TextInputMask(mask: '\R!\$! !9+,99',placeholder: '0', maxPlaceHolders: 3, reverse: true)],
                       decoration: InputDecoration(
                         labelText: 'Valor em BRL',
-                        labelStyle: TextStyle(color: Colors.deepPurple[300], fontSize: 20.0)
+                        labelStyle: TextStyle(color: Colors.deepPurple[300], fontSize: 20.0),
+                        border: OutlineInputBorder(),
                       ),
                       style: TextStyle(color: Colors.deepPurple[300], fontSize: 25.0),
                     )
