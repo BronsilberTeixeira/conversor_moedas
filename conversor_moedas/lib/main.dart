@@ -22,36 +22,70 @@ class _HomeState extends State<Home>{
   TextEditingController moedaBRL = TextEditingController();
   TextEditingController moedaURS = TextEditingController();
   TextEditingController moedaEUR = TextEditingController();
+
+  double dolar;
+  double euro;
+
   GlobalKey _formKey = GlobalKey<FormState>();  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Conversor de moedas', style: TextStyle(color: Colors.deepPurple[300]),
+        title: Text('\$ Conversor de moedas \$', style: TextStyle(color: Colors.deepPurple[300]),
         ),
         centerTitle: true,
         backgroundColor: Colors.grey[900],
       ),
       backgroundColor: Colors.grey[800],
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-        child: Form(
-          child: Column(
-            key: _formKey,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-                TextFormField(keyboardType: TextInputType.number,
-                inputFormatters: [TextInputMask(mask: '\R!\$! !9+,99',placeholder: '0', maxPlaceHolders: 3, reverse: true)],
-                decoration: InputDecoration(
-                  labelText: 'Valor em BRL',
-                  labelStyle: TextStyle(color: Colors.deepPurple[300])
-                ),
-                style: TextStyle(color: Colors.deepPurple[300], fontSize: 25.0),
+      body: FutureBuilder<Map>(
+        future: getData(),
+        builder: (context, snapshot){
+          switch(snapshot.connectionState){
+            case ConnectionState.none :
+            case ConnectionState.waiting:
+            return Center(
+              child: Text("Carregando dados...",
+                style: TextStyle(color: Colors.purple[300], fontSize: 30.0),
+              textAlign: TextAlign.center,
+              ));
+            default:
+              if(snapshot.hasError){
+                 return Center(
+                  child: Text("Erro ao carregar os dados :'(",
+                    style: TextStyle(color: Colors.red[900],
+                    fontSize: 30.0),
+                  textAlign: TextAlign.center,
+                  ));
+              }
+            dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
+            euro = snapshot.data["results"]["currencies"]["EUR"]["buy"];
+
+            return 
+            SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+              child: Form(
+                child: Column(
+                  key: _formKey,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                      Icon(Icons.monetization_on_outlined, 
+                        size: 120, 
+                        color: Colors.deepPurple[900]
+                      ),
+                      TextFormField(keyboardType: TextInputType.number,
+                      inputFormatters: [TextInputMask(mask: '\R!\$! !9+,99',placeholder: '0', maxPlaceHolders: 3, reverse: true)],
+                      decoration: InputDecoration(
+                        labelText: 'Valor em BRL',
+                        labelStyle: TextStyle(color: Colors.deepPurple[300], fontSize: 20.0)
+                      ),
+                      style: TextStyle(color: Colors.deepPurple[300], fontSize: 25.0),
+                    )
+                  ],
+                ) 
               )
-            ],
-          ) 
-        )
-      ),
+            );
+          }
+        })
     );
   }
 }
@@ -60,4 +94,5 @@ Future<Map> getData() async{
   http.Response response = await http.get(requestURL);
   return json.decode(response.body);
 }
+
 
