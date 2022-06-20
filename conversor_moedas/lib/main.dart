@@ -22,9 +22,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home>{
-  TextEditingController moedaBRL = TextEditingController();
-  TextEditingController moedaURS = TextEditingController();
-  TextEditingController moedaEUR = TextEditingController();
+  TextEditingController realController = TextEditingController();
+  TextEditingController dolarController = TextEditingController();
+  TextEditingController euroController = TextEditingController();
 
   double dolar;
   double euro;
@@ -75,15 +75,11 @@ class _HomeState extends State<Home>{
                         size: 120, 
                         color: Colors.deepPurple[900]
                       ),
-                      TextFormField(keyboardType: TextInputType.number,
-                      inputFormatters: [TextInputMask(mask: '\R!\$! !9+,99',placeholder: '0', maxPlaceHolders: 3, reverse: true)],
-                      decoration: InputDecoration(
-                        labelText: 'Valor em BRL',
-                        labelStyle: TextStyle(color: Colors.deepPurple[300], fontSize: 20.0),
-                        border: OutlineInputBorder(),
-                      ),
-                      style: TextStyle(color: Colors.deepPurple[300], fontSize: 25.0),
-                    )
+                    construirCampos('Valor em Reais', '\R!\$!', realController),
+                    Divider(),
+                    construirCampos('Valor em Dolar', '\$!', dolarController),
+                    Divider(),
+                    construirCampos('Valor em Euro', '\€!', euroController)
                   ],
                 ) 
               )
@@ -97,6 +93,22 @@ class _HomeState extends State<Home>{
 Future<Map> getData() async{
   http.Response response = await http.get(requestURL);
   return json.decode(response.body);
+}
+
+Widget construirCampos(String label, String prefix, TextEditingController controlador){
+  return   TextFormField(
+    controller: controlador,
+    keyboardType: TextInputType.number,
+    inputFormatters: [TextInputMask(mask: '$prefix !9+,99',placeholder: '0', maxPlaceHolders: 3, reverse: true)],
+    decoration: InputDecoration(
+    labelText: label,
+    labelStyle: TextStyle(color: Colors.deepPurple[300], fontSize: 20.0),
+    border: OutlineInputBorder(),
+    ),
+     style: TextStyle(
+       color: Colors.deepPurple[300], fontSize: 25.0
+       ),
+  );
 }
 
 
