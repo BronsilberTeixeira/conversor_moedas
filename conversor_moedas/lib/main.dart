@@ -33,17 +33,39 @@ class _HomeState extends State<Home>{
  
 
   void _realChanged(String text){
+    if(text.isEmpty){
+      limparCampos();
+      return;
+    }
     double real = double.parse(text);
     dolarController.text = (real/dolar).toStringAsFixed(2);
     euroController.text = (real/euro).toStringAsFixed(2);
   }
 
   void _dolarChanged(String text){
-    
+     if(text.isEmpty){
+      limparCampos();
+      return;
+    }
+    double dolar = double.parse(text);
+    realController.text = (dolar * this.dolar).toStringAsFixed(2);
+    euroController.text = (dolar * this.dolar / euro).toStringAsFixed(2);
   }
 
   void _euroChanged(String text){
-    
+     if(text.isEmpty){
+      limparCampos();
+      return;
+    }
+    double euro = double.parse(text);
+    realController.text = (euro * this.euro).toStringAsFixed(2);
+    dolarController.text = (euro * this.euro / dolar).toStringAsFixed(2);
+  }
+
+  limparCampos(){
+    realController.text = '0';
+    dolarController.text = '0';
+    euroController.text = '0';
   }
 
   GlobalKey _formKey = GlobalKey<FormState>();  
@@ -124,6 +146,7 @@ Widget construirCampos(String label, String prefix, TextEditingController contro
     labelText: label,
     labelStyle: TextStyle(color: Colors.deepPurple[300], fontSize: 20.0),
     border: OutlineInputBorder(),
+    prefixText: prefix,
     ),
      style: TextStyle(
        color: Colors.deepPurple[300], fontSize: 25.0
