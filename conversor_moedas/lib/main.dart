@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'package:easy_mask/easy_mask.dart';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 const requestURL = "https://api.hgbrasil.com/finance?format=json-cors&key=8e0b83f7";
 
@@ -22,12 +23,28 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home>{
-  TextEditingController realController = TextEditingController();
-  TextEditingController dolarController = TextEditingController();
-  TextEditingController euroController = TextEditingController();
+  final  realController = TextEditingController();
+  final  dolarController = TextEditingController();
+  final  euroController = TextEditingController();
 
   double dolar;
   double euro;
+
+ 
+
+  void _realChanged(String text){
+    double real = double.parse(text);
+    dolarController.text = (real/dolar).toStringAsFixed(2);
+    euroController.text = (real/euro).toStringAsFixed(2);
+  }
+
+  void _dolarChanged(String text){
+    
+  }
+
+  void _euroChanged(String text){
+    
+  }
 
   GlobalKey _formKey = GlobalKey<FormState>();  
   @override
@@ -62,7 +79,6 @@ class _HomeState extends State<Home>{
               }
             dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
             euro = snapshot.data["results"]["currencies"]["EUR"]["buy"];
-
             return 
             SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
@@ -75,11 +91,11 @@ class _HomeState extends State<Home>{
                         size: 120, 
                         color: Colors.deepPurple[900]
                       ),
-                    construirCampos('Valor em Reais', '\R!\$!', realController),
+                    construirCampos('Valor em Reais', '\R!\$!', realController, _realChanged),
                     Divider(),
-                    construirCampos('Valor em Dolar', '\$!', dolarController),
-                    Divider(),
-                    construirCampos('Valor em Euro', '\€!', euroController)
+                    construirCampos('Valor em Dolar', '\$!', dolarController, _dolarChanged)
+,                    Divider(),
+                    construirCampos('Valor em Euro', '\€!', euroController, _euroChanged)
                   ],
                 ) 
               )
@@ -95,11 +111,15 @@ Future<Map> getData() async{
   return json.decode(response.body);
 }
 
-Widget construirCampos(String label, String prefix, TextEditingController controlador){
-  return   TextFormField(
+Widget construirCampos(String label, String prefix, TextEditingController controlador, Function funcoes){
+   var maskFormatter = new MaskTextInputFormatter(
+    filter: {'#': RegExp(r'[0-9]')}
+  );
+
+  return TextFormField(
+      keyboardType: TextInputType.number,
+      inputFormatters: ([maskFormatter]),
     controller: controlador,
-    keyboardType: TextInputType.number,
-    inputFormatters: [TextInputMask(mask: '$prefix !9+,99',placeholder: '0', maxPlaceHolders: 3, reverse: true)],
     decoration: InputDecoration(
     labelText: label,
     labelStyle: TextStyle(color: Colors.deepPurple[300], fontSize: 20.0),
@@ -108,7 +128,10 @@ Widget construirCampos(String label, String prefix, TextEditingController contro
      style: TextStyle(
        color: Colors.deepPurple[300], fontSize: 25.0
        ),
+    onChanged: funcoes,
   );
 }
+
+
 
 
